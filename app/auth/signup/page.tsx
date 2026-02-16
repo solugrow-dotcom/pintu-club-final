@@ -50,15 +50,17 @@ export default function SignupPage() {
       })
 
       if (error) throw error
-      if (!data || !data.user) throw new Error("User not found after verification")
+      if (!data?.user) throw new Error("User not found after verification")
 
-      // Sync user to public.users table
-      await insforge.from("users").upsert({
+      // ✅ FIXED: Correct DB client usage
+      const { error: dbError } = await insforge.db.from("users").upsert({
         id: data.user.id,
         email: data.user.email,
         name: fullName,
         role: "GYM_OWNER",
       })
+
+      if (dbError) throw dbError
 
       router.push("/setup-gym")
     } catch (err: any) {
