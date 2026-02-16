@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { insforge } from "@/lib/insforge"
+import { insforge, insforgeDb } from "@/lib/insforge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -29,7 +29,7 @@ export default function SignupPage() {
       })
 
       if (error) throw error
-      if (!data) throw new Error("No data returned from signup")
+      if (!data) throw new Error("Signup failed")
 
       setStep("otp")
     } catch (err: any) {
@@ -52,8 +52,8 @@ export default function SignupPage() {
       if (error) throw error
       if (!data?.user) throw new Error("User not found after verification")
 
-      // ✅ FIXED: Correct DB client usage
-      const { error: dbError } = await insforge.db.from("users").upsert({
+      // ✅ Correct DB insert (TypeScript-safe)
+      const { error: dbError } = await insforgeDb.from("users").upsert({
         id: data.user.id,
         email: data.user.email,
         name: fullName,
@@ -64,7 +64,7 @@ export default function SignupPage() {
 
       router.push("/setup-gym")
     } catch (err: any) {
-      alert(err?.message || "Verification failed")
+      alert(err?.message || "OTP verification failed")
     } finally {
       setLoading(false)
     }
