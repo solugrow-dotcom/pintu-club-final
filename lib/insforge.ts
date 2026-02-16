@@ -1,13 +1,9 @@
-import { createClient } from '@insforge/sdk'
+import { createClient } from "insforge-js"
 
-const apiUrl = process.env.NEXT_PUBLIC_INSFORGE_API_URL
-const apiKey = process.env.NEXT_PUBLIC_INSFORGE_API_KEY
+export const insforge = createClient(
+  process.env.NEXT_PUBLIC_INSFORGE_URL!,
+  process.env.INSFORGE_SERVICE_KEY!
+)
 
-if (!apiUrl || !apiKey) {
-    console.warn('⚠️ InsForge credentials missing. Using mock adapter.')
-}
-
-export const insforge = createClient({
-    baseUrl: apiUrl || 'https://xt68ppra.ap-southeast.insforge.app',
-    anonKey: apiKey || 'mock-key'
-})
+// 👇 DB client explicitly expose karo
+export const insforgeDb = insforge as any
